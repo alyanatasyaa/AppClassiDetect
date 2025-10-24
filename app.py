@@ -71,7 +71,9 @@ def set_custom_css(primary_bg, sidebar_bg, text_color,
     st.markdown(f"""
         <style>
         [data-testid="stAppViewContainer"],
-        [data-testid="stToolbar"] {{
+        [data-testid="stToolbar"],
+        [data-testid="stFullScreenFrame"],
+        [data-testid="stMainMenuList"] li {{
             background-color: {primary_bg} !important;
             transition: all 0.4s ease-in-out;
         }}
@@ -123,10 +125,6 @@ def set_custom_css(primary_bg, sidebar_bg, text_color,
             background-color: {border_color} !important;
         }}
 
-        [data-testid="stFullScreenFrame"] {{
-            background-color: {primary_bg} !important;
-        }}
-
         h1, h2, h3, h4, h5, h6, p, label, span, div {{
             color: {text_color} !important;
         }}
@@ -147,16 +145,15 @@ def main():
     
     if app_mode == 'About App':
         
-        st.header("Introduction to the App")
+        st.header("Welcome to this interactive dashboard! 🚀")
                 
         st.markdown(
         """
-        <p>🚀 Welcome to this interactive dashboard! This project showcases two exciting
-        <b>Computer Vision</b> tasks powered by <b>Deep Learning</b> models:</p>
+        <p>This project showcases two exciting <b>Computer Vision</b> tasks powered by <b>Deep Learning</b> models:</p>
         <p>🖼️ <b>Image Classification</b> using a <b>Convolutional Neural Network (CNN)</b><br>
         🔎 <b>Object Detection</b> using <b>YOLOv8n</b></p>
 
-        <p>💡 The goal of this dashboard is to make it easier to understand how these models work,
+        <p>The goal of this dashboard is to make it easier to understand how these models work,
         visualize their results, and interactively test them with your own images.</p>
 
         <hr>
