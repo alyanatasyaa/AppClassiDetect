@@ -66,18 +66,16 @@ else:
     border_color = "#B9B5B5"
     toggle_active = "#B9B5B5"
 
-def set_custom_css(primary_bg, sidebar_bg, text_color, border_color, button_bg, toggle_active):
-    """Apply custom CSS styling for light/dark mode."""
+def set_custom_css(primary_bg, sidebar_bg, text_color, 
+                   border_color, button_bg, toggle_active):
     st.markdown(f"""
         <style>
-        /* Main background and header*/
         [data-testid="stAppViewContainer"],
         [data-testid="stToolbar"] {{
             background-color: {primary_bg} !important;
             transition: all 0.4s ease-in-out;
         }}
 
-        /* Sidebar */
         [data-testid="stSidebar"], 
         [data-testid="stSidebarContent"] {{
             background-color: {sidebar_bg} !important;
@@ -85,7 +83,6 @@ def set_custom_css(primary_bg, sidebar_bg, text_color, border_color, button_bg, 
             min-height: 100vh !important;
         }}
 
-        /* Selectbox */
         [data-baseweb="select"] > div,
         [data-testid="stSelectboxVirtualDropdown"] {{
             background-color: {primary_bg} !important;
