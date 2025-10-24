@@ -1,12 +1,10 @@
 # 🐧 ClassiDetect – Object Detection Dashboard
 
-ClassiDetect is a Streamlit-based web application for detecting and classifying objects in images:
-1. **Klasifikasi jenis tas** menggunakan CNN
-2. **Deteksi penguin dan kura-kura** menggunakan YOLOv8
+**ClassiDetect** is a Streamlit-based web application for detecting and classifying objects in images:
+1. **Bag classification** using a CNN model  
+2. **Penguin and turtle detection** using YOLOv8 
 ---
 ## 🚀 Key Features
-- 📸 Upload images and get result instantly
-- 🌗 Supports both dark and light themes
-- 🧩 Simple, clean, and responsive dashboard built with Streamlit
-
-Aplikasi ini sudah dideploy di **Streamlit Cloud** dan dapat diakses melalui link berikut:
+- Upload images and get instant result
+- Supports both dark and light themes
+- Simple, clean, and responsive dashboard built with Streamlit
