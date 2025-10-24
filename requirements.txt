@@ -1,4 +1,5 @@
 streamlit
+streamlit-js-eval
 ultralytics
 tensorflow
 opencv-python-headless
