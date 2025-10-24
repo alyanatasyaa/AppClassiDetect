@@ -36,11 +36,10 @@ def classify_image(img, st):
 def detect_objects(img, st):
     results = detection_model(img)
     result = results[0]
-
     im_array = result.plot()
 
-    st.subheader("Output Image")
-    st.write(f"Number of objects detected: **{len(result.boxes)}**")
+    st.subheader("Detection Result")
+    st.success(f"Number of objects detected: **{len(result.boxes)}**")
     st.image(im_array[..., ::-1], channels="RGB", use_container_width=True)
 
 st.set_page_config( page_title="ClassiDetect", page_icon="⚙️")
@@ -108,7 +107,8 @@ def set_custom_css(primary_bg, sidebar_bg, text_color,
             transition: all 0.3s ease-in-out;
         }}
 
-        [data-testid="stBaseButton-secondary"] {{
+        [data-testid="stBaseButton-secondary"],
+        [data-testid="stCameraInputButton"] {{
             background-color: {sidebar_bg} !important;
             border: 1px solid {border_color} !important;
         }}
@@ -145,11 +145,11 @@ def main():
     
     if app_mode == 'About App':
         
-        st.header("Welcome to this interactive dashboard! 🚀")
+        st.header("Welcome to ClassiDetect! ⚙️")
                 
         st.markdown(
         """
-        <p>This project showcases two exciting <b>Computer Vision</b> tasks powered by <b>Deep Learning</b> models:</p>
+        <p>This dashboard showcases two exciting <b>Computer Vision</b> tasks powered by <b>Deep Learning</b> models:</p>
         <p>🖼️ <b>Image Classification</b> using a <b>Convolutional Neural Network (CNN)</b><br>
         🔎 <b>Object Detection</b> using <b>YOLOv8n</b></p>
 
@@ -158,7 +158,7 @@ def main():
 
         <hr>
 
-        <h4>🧭 How to Use the App:</h4>
+        <h4>🚀 How to Use the App:</h4>
         <p>
         &#x2022; In the sidebar, select the desired mode under <b>“Choose the App Mode”</b>.<br>
         &#x2022; Choose <b>“Image Classification”</b> to upload an image and let the CNN model predict its category.<br>
@@ -169,7 +169,7 @@ def main():
 
         <hr>
 
-        <p><b>Enjoy exploring the app and have fun experimenting with computer vision! ⚙️🧩</b></p>
+        <p><b>Enjoy exploring the app and have fun experimenting with computer vision!</b></p>
         """, unsafe_allow_html=True
     )
     
@@ -180,17 +180,23 @@ def main():
         st.sidebar.markdown("----")
         
         uploaded_file = st.sidebar.file_uploader("Upload an image", type=['jpg','jpeg', 'png'])
+        capture_image = st.sidebar.camera_input("Or take a photo using webcam")
         st.sidebar.warning(
         "This model is optimized to classify garbage, paper, and plastic bags only. The model may not perform accurately on other objects.",
         icon=":material/info:",
         )
+        
         DEMO_CLASS_IMAGE = "sample_images/00001348.jpg"
 
-        if uploaded_file is not None:
+        if capture_image is not None:
+            image = np.array(Image.open(capture_image))
+            img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        elif uploaded_file is not None:
             file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
             img = cv2.imdecode(file_bytes, 1)
             image = np.array(Image.open(uploaded_file))
         else:
+            DEMO_CLASS_IMAGE = "sample_images/00001348.jpg"
             img = cv2.imread(DEMO_CLASS_IMAGE)
             image = np.array(Image.open(DEMO_CLASS_IMAGE))
 
@@ -206,19 +212,26 @@ def main():
         st.sidebar.markdown("----")
                 
         uploaded_file  = st.sidebar.file_uploader("Upload an image", type=['jpg','jpeg', 'png'])
+        capture_image = st.sidebar.camera_input("Or take a photo using webcam")
+        
         st.sidebar.warning(
         "This model is optimized to detect only penguin and turtle.",
         icon=":material/info:",
         )
+        
         DEMO_DETECT_IMAGE = "sample_images/image_id_118.jpg"
         
-        if uploaded_file  is not None:
+        if capture_image is not None:
+            image = np.array(Image.open(capture_image))
+            img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        elif uploaded_file is not None:
             file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
             img = cv2.imdecode(file_bytes, 1)
             image = np.array(Image.open(uploaded_file))
         else:
             img = cv2.imread(DEMO_DETECT_IMAGE)
             image = np.array(Image.open(DEMO_DETECT_IMAGE))
+            
         st.sidebar.text("Original Image")
         st.sidebar.image(image)
         
