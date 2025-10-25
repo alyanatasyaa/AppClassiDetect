@@ -6,6 +6,8 @@ from ultralytics import YOLO
 import streamlit as st
 from streamlit_js_eval import streamlit_js_eval
 
+st.set_page_config( page_title="ClassiDetect", page_icon="⚙️")
+
 @st.cache_resource
 def load_models():
     detection_model = YOLO("model/AlyaNatasya_Laporan4.pt")
@@ -32,6 +34,8 @@ def classify_image(img, st):
 
     st.subheader("Classification Result")
     st.success(f"Prediction: **{class_labels[predicted_class]}** ({confidence:.2f}% confidence)")
+    st.text("Input Image")
+    st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), use_container_width=True)
 
 def detect_objects(img, st):
     results = detection_model(img)
@@ -40,9 +44,47 @@ def detect_objects(img, st):
 
     st.subheader("Detection Result")
     st.success(f"Number of objects detected: **{len(result.boxes)}**")
-    st.image(im_array[..., ::-1], channels="RGB", use_container_width=True)
 
-st.set_page_config( page_title="ClassiDetect", page_icon="⚙️")
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.text("Original Image")
+        st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), use_container_width=True)
+    with col2:
+        st.text("Output Image")   
+        st.image(im_array[..., ::-1], channels="RGB", use_container_width=True)
+
+def get_image_input(default_image_path, warning_text=None):
+    
+    st.sidebar.markdown("----")
+
+    input_method = st.sidebar.radio(
+        "Select input method:",
+        ("Upload from device", "Take a photo"),
+        key=f"input_method_{default_image_path}" 
+    )
+
+    uploaded_file, capture_image = None, None
+
+    if input_method == "Upload from device":
+        uploaded_file = st.sidebar.file_uploader("Upload an image", type=['jpg', 'jpeg', 'png'])
+    elif input_method == "Take a photo":
+        capture_image = st.sidebar.camera_input("Take a photo using webcam")
+
+    if warning_text:
+        st.sidebar.warning(warning_text, icon=":material/info:")
+
+    if capture_image is not None:
+        image = np.array(Image.open(capture_image))
+        img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    elif uploaded_file is not None:
+        file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
+        img = cv2.imdecode(file_bytes, 1)
+        image = np.array(Image.open(uploaded_file))
+    else:
+        img = cv2.imread(default_image_path)
+        image = np.array(Image.open(default_image_path))
+
+    return img, image
 
 col1, col2 = st.sidebar.columns([0.5, 3])
 with col1:
@@ -177,31 +219,12 @@ def main():
         
         st.header("🖼️ Classification Image with CNN")
         
-        st.sidebar.markdown("----")
-        
-        uploaded_file = st.sidebar.file_uploader("Upload an image", type=['jpg','jpeg', 'png'])
-        capture_image = st.sidebar.camera_input("Or take a photo using webcam")
-        st.sidebar.warning(
-        "This model is optimized to classify garbage, paper, and plastic bags only. The model may not perform accurately on other objects.",
-        icon=":material/info:",
-        )
-        
         DEMO_CLASS_IMAGE = "sample_images/00001348.jpg"
 
-        if capture_image is not None:
-            image = np.array(Image.open(capture_image))
-            img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        elif uploaded_file is not None:
-            file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
-            img = cv2.imdecode(file_bytes, 1)
-            image = np.array(Image.open(uploaded_file))
-        else:
-            DEMO_CLASS_IMAGE = "sample_images/00001348.jpg"
-            img = cv2.imread(DEMO_CLASS_IMAGE)
-            image = np.array(Image.open(DEMO_CLASS_IMAGE))
-
-        st.sidebar.text("Original Image")
-        st.sidebar.image(image)
+        img, image = get_image_input(
+            DEMO_CLASS_IMAGE,
+            warning_text="This model is optimized to classify garbage, paper, and plastic bags only. The model may not perform accurately on other objects."
+        )
 
         classify_image(img, st)
     
@@ -209,32 +232,13 @@ def main():
         
         st.header("🔎 Object Detection with YOLOv8n",)
         
-        st.sidebar.markdown("----")
-                
-        uploaded_file  = st.sidebar.file_uploader("Upload an image", type=['jpg','jpeg', 'png'])
-        capture_image = st.sidebar.camera_input("Or take a photo using webcam")
-        
-        st.sidebar.warning(
-        "This model is optimized to detect only penguin and turtle.",
-        icon=":material/info:",
-        )
-        
         DEMO_DETECT_IMAGE = "sample_images/image_id_118.jpg"
         
-        if capture_image is not None:
-            image = np.array(Image.open(capture_image))
-            img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        elif uploaded_file is not None:
-            file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
-            img = cv2.imdecode(file_bytes, 1)
-            image = np.array(Image.open(uploaded_file))
-        else:
-            img = cv2.imread(DEMO_DETECT_IMAGE)
-            image = np.array(Image.open(DEMO_DETECT_IMAGE))
+        img, image = get_image_input(
+            DEMO_DETECT_IMAGE,
+            warning_text="This model is optimized to detect only penguin and turtle."
+        )
             
-        st.sidebar.text("Original Image")
-        st.sidebar.image(image)
-        
         detect_objects(img, st)     
     
 if __name__ == "__main__":
@@ -242,4 +246,3 @@ if __name__ == "__main__":
         main()
     except SystemExit:
         pass
-        
